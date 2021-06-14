@@ -29,8 +29,8 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/", "index", "/css/*", "/js/*")
-                .permitAll()
+                .antMatchers("/", "index", "/css/*", "/js/*").permitAll()    //only permit these APIs without authentication
+                .antMatchers("/api/**").hasRole(STUDENT.name())              //only permit STUDENT to these APIs
                 .anyRequest()
                 .authenticated()
                 .and()
