@@ -41,7 +41,9 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin()
                 .loginPage("/login").permitAll()    //permit all request with url /login
-                .defaultSuccessUrl("/courses",true);
+                .defaultSuccessUrl("/courses",true)
+                .and()
+                .rememberMe();    //by default active for 2 weeks
 
     }
 
