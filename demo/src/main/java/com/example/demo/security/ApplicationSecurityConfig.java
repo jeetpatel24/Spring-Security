@@ -45,8 +45,16 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginPage("/login").permitAll()    //permit all request with url /login
                 .defaultSuccessUrl("/courses",true)
                 .and()
-                .rememberMe().tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))    //by default active for 2 weeks
-                    .key("somethingverysecured");
+                .rememberMe()
+                    .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))    //by default active for 2 weeks
+                    .key("somethingverysecured")
+                .and()
+                .logout()
+                    .logoutUrl("/logout")
+                    .clearAuthentication(true)
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID", "remember-me")
+                    .logoutSuccessUrl("/login");    //redirect to /login after successful logout
 
     }
 
