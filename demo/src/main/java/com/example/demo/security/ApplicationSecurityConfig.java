@@ -1,6 +1,7 @@
 package com.example.demo.security;
 
 import com.example.demo.auth.ApplicationUserService;
+import com.example.demo.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -40,30 +42,15 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))    //authenticationManager() is coming from WebSecurityConfigurerAdapter
                 .authorizeRequests()
                 .antMatchers("/", "index", "/css/*", "/js/*").permitAll()    //only permit these APIs without authentication
                 .antMatchers("/api/**").hasRole(STUDENT.name())              //only permit STUDENT to these APIs
                 .anyRequest()
-                .authenticated()
-                .and()
-                .formLogin()
-                    .loginPage("/login").permitAll()    //permit all request with url /login
-                    .defaultSuccessUrl("/courses",true)
-                    .passwordParameter("password")    //same name as name given for password label in login.html
-                    .usernameParameter("username")    //same name as name given for username label in login.html
-                .and()
-                .rememberMe()
-                    .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))    //by default active for 2 weeks
-                    .key("somethingverysecured")
-                    .rememberMeParameter("remember-me")    //same name as name given for remember-me label in login.html
-                .and()
-                .logout()
-                    .logoutUrl("/logout")
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))    //add this line when csrf().disable()
-                    .clearAuthentication(true)
-                    .invalidateHttpSession(true)
-                    .deleteCookies("JSESSIONID", "remember-me")
-                    .logoutSuccessUrl("/login");    //redirect to /login after successful logout
+                .authenticated();
 
     }
 
